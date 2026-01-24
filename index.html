@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>积分记录</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont;
+      background: #f5f5f5;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,.1);
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    .score {
+      font-size: 48px;
+      text-align: center;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+
+    .section {
+      margin-bottom: 25px;
+    }
+
+    .section h2 {
+      font-size: 20px;
+      margin-bottom: 10px;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 8px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .task-btn {
+      background: #e3f2fd;
+    }
+
+    .reward {
+      padding: 10px;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    .reward.disabled {
+      background: #eee;
+      color: #999;
+      cursor: not-allowed;
+    }
+
+    .reward.active {
+      background: #c8e6c9;
+      color: #1b5e20;
+    }
+
+    .reset {
+      background: #ff5252;
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>积分记录</h1>
+  <div class="score" id="score">0</div>
+
+  <div class="section">
+    <h2>家务任务</h2>
+    <div id="tasks"></div>
+  </div>
+
+  <div class="section">
+    <h2>奖励兑换</h2>
+    <div id="rewards"></div>
+  </div>
+
+  <button class="reset" onclick="resetScore()">清零积分</button>
+</div>
+
+<script>
+  let totalScore = 0;
+
+  const tasks = [
+    { name: "清理1双鞋子", score: 10 },
+    { name: "按摩1次", score: 10 },
+    { name: "洗衣服1次", score: 10 },
+    { name: "准备早饭", score: 10 },
+    { name: "车夫1次", score: 10 },
+    { name: "打扫卫生1次", score: 10 },
+    { name: "脚垫1小时", score: 20 },
+    { name: "鞋架1小时", score: 20 },
+    { name: "除臭1小时", score: 20 },
+    { name: "坐垫1小时", score: 20 },
+    { name: "尿壶1次", score: 20 },
+    { name: "马桶1次", score: 50 },
+    { name: "锁1天", score: 50 },
+    { name: "口器侍寝1次", score: 50 },
+    { name: "贡金500元", score: 100 }
+  ];
+
+  const rewards = [
+    { name: "照片1张", need: 20 },
+    { name: "舔脚10分钟", need: 50 },
+    { name: "保养玉足1分钟", need: 50 },
+    { name: "原味袜套", need: 100 },
+    { name: "原味内内", need: 200 },
+    { name: "开锁1次", need: 300 },
+    { name: "释放1次", need: 500 },
+    { name: "侍寝1次", need: 1000 }
+  ];
+
+  const scoreEl = document.getElementById("score");
+  const taskEl = document.getElementById("tasks");
+  const rewardEl = document.getElementById("rewards");
+
+  function renderTasks() {
+    tasks.forEach(t => {
+      const btn = document.createElement("button");
+      btn.className = "task-btn";
+      btn.innerText = `${t.name} +${t.score}`;
+      btn.onclick = () => {
+        totalScore += t.score;
+        update();
+      };
+      taskEl.appendChild(btn);
+    });
+  }
+
+  function renderRewards() {
+    rewardEl.innerHTML = "";
+    rewards.forEach(r => {
+      const div = document.createElement("div");
+      div.className = "reward " + (totalScore >= r.need ? "active" : "disabled");
+      div.innerText = `${r.name}（${r.need}分）`;
+      div.onclick = () => {
+        if (totalScore < r.need) return;
+        if (confirm(`消耗 ${r.need} 分兑换「${r.name}」？`)) {
+          totalScore -= r.need;
+          update();
+        }
+      };
+      rewardEl.appendChild(div);
+    });
+  }
+
+  function update() {
+    scoreEl.innerText = totalScore;
+    renderRewards();
+  }
+
+  function resetScore() {
+    if (confirm("确定清零积分？")) {
+      totalScore = 0;
+      update();
+    }
+  }
+
+  renderTasks();
+  update();
+</script>
+
+</body>
+</html>
