@@ -1,123 +1,92 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <title>积分记录</title>
+  <meta charset="UTF-8" />
+  <title>家务积分系统</title>
   <style>
     body {
       font-family: system-ui, -apple-system, BlinkMacSystemFont;
-      background: #f5f5f5;
-      margin: 0;
-      padding: 20px;
-    }
-
-    .container {
-      max-width: 600px;
+      background: #f2f2f2;
+      padding: 16px;
+      max-width: 480px;
       margin: auto;
-      background: #fff;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 10px rgba(0,0,0,.1);
     }
 
-    h1 {
-      text-align: center;
-      margin-bottom: 10px;
+    h2 {
+      margin-top: 24px;
     }
 
     .score {
-      font-size: 48px;
-      text-align: center;
+      font-size: 22px;
       font-weight: bold;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
     }
 
-    .section {
-      margin-bottom: 25px;
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
     }
 
-    .section h2 {
-      font-size: 20px;
-      margin-bottom: 10px;
-    }
-
-    button {
-      width: 100%;
-      padding: 10px;
-      margin-bottom: 8px;
-      font-size: 16px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-
-    .task-btn {
-      background: #e3f2fd;
-    }
-
-    .reward {
+    .card {
+      background: #fff;
       padding: 10px;
       border-radius: 8px;
-      margin-bottom: 8px;
-      cursor: pointer;
       text-align: center;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+      user-select: none;
     }
 
-    .reward.disabled {
-      background: #eee;
-      color: #999;
-      cursor: not-allowed;
+    .card:active {
+      transform: scale(0.97);
     }
 
-    .reward.active {
-      background: #c8e6c9;
-      color: #1b5e20;
+    #log {
+      background: #fff;
+      padding: 10px;
+      border-radius: 8px;
+      max-height: 200px;
+      overflow-y: auto;
+      font-size: 14px;
     }
 
-    .reset {
-      background: #ff5252;
-      color: #fff;
+    #log div {
+      margin-bottom: 6px;
     }
   </style>
 </head>
+
 <body>
 
-<div class="container">
-  <h1>积分记录</h1>
-  <div class="score" id="score">0</div>
+  <div class="score">当前积分：<span id="score">0</span></div>
 
-  <div class="section">
-    <h2>家务任务</h2>
-    <div id="tasks"></div>
-  </div>
+  <h2>📌 任务</h2>
+  <div id="tasks" class="grid"></div>
 
-  <div class="section">
-    <h2>奖励兑换</h2>
-    <div id="rewards"></div>
-  </div>
+  <h2>🎁 奖励</h2>
+  <div id="rewards" class="grid"></div>
 
-  <button class="reset" onclick="resetScore()">清零积分</button>
-</div>
+  <h2>📜 记录</h2>
+  <div id="log"></div>
 
 <script>
-  let totalScore = 0;
-
   const tasks = [
-    { name: "清理1双鞋子", score: 10 },
-    { name: "按摩1次", score: 10 },
-    { name: "洗衣服1次", score: 10 },
-    { name: "准备早饭", score: 10 },
-    { name: "车夫1次", score: 10 },
-    { name: "打扫卫生1次", score: 10 },
-    { name: "脚垫1小时", score: 20 },
-    { name: "鞋架1小时", score: 20 },
-    { name: "除臭1小时", score: 20 },
-    { name: "坐垫1小时", score: 20 },
-    { name: "尿壶1次", score: 20 },
-    { name: "马桶1次", score: 50 },
-    { name: "锁1天", score: 50 },
-    { name: "口器侍寝1次", score: 50 },
-    { name: "贡金500元", score: 100 }
+    { name: "清理1双鞋子", score: 10, count: 0 },
+    { name: "按摩1次", score: 10, count: 0 },
+    { name: "洗衣服1次", score: 10, count: 0 },
+    { name: "准备早饭", score: 10, count: 0 },
+    { name: "车夫1次", score: 10, count: 0 },
+    { name: "打扫卫生1次", score: 10, count: 0 },
+    { name: "脚垫1小时", score: 20, count: 0 },
+    { name: "鞋架1小时", score: 20, count: 0 },
+    { name: "除臭1小时", score: 20, count: 0 },
+    { name: "坐垫1小时", score: 20, count: 0 },
+    { name: "尿壶1次", score: 20, count: 0 },
+    { name: "马桶1次", score: 50, count: 0 },
+    { name: "锁1天", score: 50, count: 0 },
+    { name: "口器侍寝1次", score: 50, count: 0 },
+    { name: "贡金500元", score: 100, count: 0 }
   ];
 
   const rewards = [
@@ -131,20 +100,51 @@
     { name: "侍寝1次", need: 1000 }
   ];
 
+  let totalScore = 0;
+
   const scoreEl = document.getElementById("score");
   const taskEl = document.getElementById("tasks");
   const rewardEl = document.getElementById("rewards");
+  const logEl = document.getElementById("log");
+
+  function save() {
+    localStorage.setItem("score", totalScore);
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+    localStorage.setItem("log", logEl.innerHTML);
+  }
+
+  function load() {
+    totalScore = Number(localStorage.getItem("score")) || 0;
+    const savedTasks = localStorage.getItem("tasks");
+    if (savedTasks) {
+      JSON.parse(savedTasks).forEach((t, i) => tasks[i].count = t.count);
+    }
+    const savedLog = localStorage.getItem("log");
+    if (savedLog) logEl.innerHTML = savedLog;
+  }
+
+  function logAction(text) {
+    const time = new Date().toLocaleTimeString();
+    const div = document.createElement("div");
+    div.textContent = `[${time}] ${text}`;
+    logEl.prepend(div);
+  }
 
   function renderTasks() {
-    tasks.forEach(t => {
-      const btn = document.createElement("button");
-      btn.className = "task-btn";
-      btn.innerText = `${t.name} +${t.score}`;
-      btn.onclick = () => {
-        totalScore += t.score;
+    taskEl.innerHTML = "";
+    tasks.forEach(task => {
+      const div = document.createElement("div");
+      div.className = "card";
+      div.textContent = task.count
+        ? `${task.name} ×${task.count}（+${task.score}）`
+        : `${task.name}（+${task.score}）`;
+      div.onclick = () => {
+        task.count++;
+        totalScore += task.score;
+        logAction(`完成任务：${task.name} ×${task.count}（+${task.score}）`);
         update();
       };
-      taskEl.appendChild(btn);
+      taskEl.appendChild(div);
     });
   }
 
@@ -152,12 +152,16 @@
     rewardEl.innerHTML = "";
     rewards.forEach(r => {
       const div = document.createElement("div");
-      div.className = "reward " + (totalScore >= r.need ? "active" : "disabled");
-      div.innerText = `${r.name}（${r.need}分）`;
+      div.className = "card";
+      div.textContent = `${r.name}（-${r.need}）`;
       div.onclick = () => {
-        if (totalScore < r.need) return;
-        if (confirm(`消耗 ${r.need} 分兑换「${r.name}」？`)) {
+        if (totalScore < r.need) {
+          alert("积分不足");
+          return;
+        }
+        if (confirm(`确定兑换「${r.name}」？`)) {
           totalScore -= r.need;
+          logAction(`兑换奖励：${r.name}（-${r.need}）`);
           update();
         }
       };
@@ -166,20 +170,17 @@
   }
 
   function update() {
-    scoreEl.innerText = totalScore;
+    scoreEl.textContent = totalScore;
+    renderTasks();
     renderRewards();
+    save();
   }
 
-  function resetScore() {
-    if (confirm("确定清零积分？")) {
-      totalScore = 0;
-      update();
-    }
-  }
-
-  renderTasks();
+  load();
   update();
 </script>
 
 </body>
 </html>
+
+
