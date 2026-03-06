@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>每日成长积分</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app">
+    <div class="topbar">
+      <div class="title-wrap">
+        <div class="title">每日成长积分</div>
+        <div class="subtitle">专注成长，减少浪费</div>
+      </div>
+      <button class="icon-btn" id="historyBtn" title="查看记录">📅</button>
+    </div>
+
+    <div class="hero">
+      <div class="score-label">今日总分</div>
+      <div class="score-value" id="score">0</div>
+      <div class="score-sub" id="scoreSub">累计总分：0</div>
+      <div class="summary">
+        <div class="pill">
+          <div class="small">今日成长</div>
+          <div class="big" id="gainToday">0</div>
+        </div>
+        <div class="pill">
+          <div class="small">今日浪费</div>
+          <div class="big" id="wasteToday">0</div>
+        </div>
+        <div class="pill">
+          <div class="small">今日净值</div>
+          <div class="big" id="netToday">0</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-head">
+        <h2>📌 每日任务</h2>
+        <div class="section-tip">点击卡片即可记录</div>
+      </div>
+      <div class="grid" id="tasks"></div>
+    </div>
+
+    <div class="section">
+      <div class="section-head">
+        <h2>⏳ 浪费时间</h2>
+        <div class="section-tip">30 分钟扣 30 分</div>
+      </div>
+      <div class="card waste-box">
+        <input id="wasteInput" type="number" placeholder="输入浪费的分钟数" min="1" />
+        <button class="btn danger" id="addWasteBtn">记录浪费时间</button>
+        <div class="hint">例如输入 45，则按 2 个 30 分钟计算，扣 60 分。</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-head">
+        <h2>📜 今日记录</h2>
+        <div class="section-tip">点 ↩ 可以撤销</div>
+      </div>
+      <div id="log"></div>
+    </div>
+  </div>
+
+  <div class="modal" id="studyModal">
+    <div class="backdrop" data-close="studyModal"></div>
+    <div class="modal-panel">
+      <div class="modal-head">
+        <h2 style="margin:0;">选择学习时长</h2>
+        <button class="icon-btn" data-close="studyModal">✕</button>
+      </div>
+      <div class="badge">固定时长或自定义时长都可以</div>
+      <div class="sub-grid" id="studyList"></div>
+    </div>
+  </div>
+
+  <div class="modal" id="fitnessModal">
+    <div class="backdrop" data-close="fitnessModal"></div>
+    <div class="modal-panel">
+      <div class="modal-head">
+        <h2 style="margin:0;">选择健身项目</h2>
+        <button class="icon-btn" data-close="fitnessModal">✕</button>
+      </div>
+      <div class="badge">点一下就会立即计分</div>
+      <div class="sub-grid" id="fitnessList"></div>
+    </div>
+  </div>
+
+  <div class="modal" id="wakeModal">
+    <div class="backdrop" data-close="wakeModal"></div>
+    <div class="modal-panel">
+      <div class="modal-head">
+        <h2 style="margin:0;">选择早起时间</h2>
+        <button class="icon-btn" data-close="wakeModal">✕</button>
+      </div>
+      <div class="badge">越早起分值越高</div>
+      <div class="sub-grid" id="wakeList"></div>
+    </div>
+  </div>
+
+  <div class="drawer" id="historyDrawer">
+    <div class="backdrop" data-close="historyDrawer"></div>
+    <div class="drawer-panel">
+      <div class="drawer-head">
+        <h2 style="margin:0;">每日记录</h2>
+        <button class="icon-btn" data-close="historyDrawer">✕</button>
+      </div>
+      <input type="date" id="historyDate" />
+      <div class="hint" style="margin-top:8px;">选择某一天，查看当天完成了什么以及浪费了多少时间。点 ↩ 也可以撤销。</div>
+      <div id="historyContent"></div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
